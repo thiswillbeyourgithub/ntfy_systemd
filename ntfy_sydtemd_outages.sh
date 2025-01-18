@@ -15,7 +15,10 @@ if [[ -n "$failed_units" ]]; then
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
         unit_status=$(systemctl status "$unit_name" --no-pager | head -n 3)
-        message+="Unit: $unit_name\n$unit_status\n\n"
+        message+="Unit: $unit_name
+$unit_status
+
+"
     done <<< "$failed_units"
 
     # Send notification via ntfy
