@@ -1,8 +1,10 @@
 #!/bin/zsh
 
-# Check if NTFY_URL is set
-if [[ -z "${NTFY_URL}" ]]; then
-    echo "Error: NTFY_URL environment variable is not set"
+NTFY_TOPIC=$1
+
+if [[ -z "$NTFY_TOPIC" ]]
+then
+    echo "You need to pass in a ntfy topic as argument or 'print' to just echo the output"
     exit 1
 fi
 
@@ -21,9 +23,10 @@ $unit_status
 "
     done <<< "$failed_units"
 
-    # Send notification via ntfy
-    curl -H "Priority: high" \
-         -H "Tags: warning" \
-         -d "$message" \
-         "$NTFY_URL"
+    if [[ "$NTFY_TOPIC" == "print" ]]
+    then
+        echo "$message"
+    else
+        ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+    fi
 fi
