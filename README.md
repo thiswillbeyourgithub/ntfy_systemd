@@ -53,7 +53,7 @@ When a problematic unit is detected, you'll receive a notification with:
 
 ## License
 
-MIT License
+GPLv3
 
 ## Contributing
 
