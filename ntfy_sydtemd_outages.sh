@@ -31,3 +31,27 @@ $unit_status
         ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
     fi
 fi
+
+
+# now same for user units
+failed_units=$(systemctl --user list-units --state=failed,degraded --no-legend --plain)
+
+if [[ -n "$failed_units" ]]; then
+    # Format the message
+    message="Problematic systemd user units detected\n\n"
+    while IFS= read -r unit; do
+        unit_name=$(echo "$unit" | awk '{print $1}')
+        unit_status=$(systemctl --user status "$unit_name" --no-pager | head -n 3)
+        message+="Unit: $unit_name
+$unit_status
+
+"
+    done <<< "$failed_units"
+
+    if [[ "$NTFY_TOPIC" == "print" ]]
+    then
+        echo "$message"
+    else
+        ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+    fi
+fi
