@@ -1,6 +1,7 @@
 #!/bin/zsh
 
 NTFY_TOPIC=$1
+NTFY_TITLE="Systemd Failed Notifier"
 
 if [[ -z "$NTFY_TOPIC" ]]
 then
