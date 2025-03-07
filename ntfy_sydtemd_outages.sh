@@ -14,7 +14,7 @@ failed_units=$(systemctl list-units --state=failed,degraded --no-legend --plain)
 
 if [[ -n "$failed_units" ]]; then
     # Format the message
-    message="System Alert: Problematic systemd units detected\n\n"
+    message="Problematic systemd units detected\n\n"
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
         unit_status=$(systemctl status "$unit_name" --no-pager | head -n 3)
