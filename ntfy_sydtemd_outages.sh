@@ -4,6 +4,7 @@ NTFY_TOPIC=$1
 NTFY_TITLE="Systemd Failed Notifier"
 # Default exclusions
 EXCLUDE_UNITS="pulseaudio"
+#EXCLUDE_UNITS="pulseaudio,bluetooth"
 
 if [[ -z "$NTFY_TOPIC" ]]
 then
@@ -22,6 +23,8 @@ failed_units=$(systemctl list-units --state=failed,degraded --no-legend --plain)
 if [[ -n "$failed_units" ]]; then
     # Format the message
     message="Problematic systemd units detected\n\n"
+    has_units_to_report=0
+    
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
         
@@ -43,13 +46,16 @@ if [[ -n "$failed_units" ]]; then
 $unit_status
 
 "
+        has_units_to_report=1
     done <<< "$failed_units"
 
-    if [[ "$NTFY_TOPIC" == "print" ]]
-    then
-        echo "$message"
-    else
-        ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+    # Only send notification if there are actual units to report
+    if [[ $has_units_to_report -eq 1 ]]; then
+        if [[ "$NTFY_TOPIC" == "print" ]]; then
+            echo "$message"
+        else
+            ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+        fi
     fi
 fi
 
@@ -60,6 +66,8 @@ failed_units=$(systemctl --user list-units --state=failed,degraded --no-legend -
 if [[ -n "$failed_units" ]]; then
     # Format the message
     message="Problematic systemd user units detected\n\n"
+    has_units_to_report=0
+    
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
         
@@ -81,12 +89,15 @@ if [[ -n "$failed_units" ]]; then
 $unit_status
 
 "
+        has_units_to_report=1
     done <<< "$failed_units"
 
-    if [[ "$NTFY_TOPIC" == "print" ]]
-    then
-        echo "$message"
-    else
-        ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+    # Only send notification if there are actual units to report
+    if [[ $has_units_to_report -eq 1 ]]; then
+        if [[ "$NTFY_TOPIC" == "print" ]]; then
+            echo "$message"
+        else
+            ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+        fi
     fi
 fi
