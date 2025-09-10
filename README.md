@@ -26,9 +26,9 @@ A simple shell script that monitors systemd units and sends notifications via nt
 
 ## Usage
 
-Run the script manually by passing your ntfy topic as an argument:
+Run the script manually by passing your ntfy url/topic as an argument:
 ```bash
-./ntfy_sydtemd_outages.sh https://ntfy.sh/your-topic
+./ntfy_sydtemd_outages.sh ntfy.sh/your-topic
 ```
 
 To test without sending notifications, use 'print':
@@ -40,7 +40,7 @@ For automated monitoring, set up a cron job or systemd timer.
 
 Example crontab entry (check every 5 minutes):
 ```
-*/5 * * * * /path/to/ntfy_sydtemd_outages.sh https://ntfy.sh/your-topic
+*/5 * * * * /path/to/ntfy_sydtemd_outages.sh ntfy.sh/your-topic
 ```
 
 ## Notifications

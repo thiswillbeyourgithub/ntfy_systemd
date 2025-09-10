@@ -1,12 +1,12 @@
 #!/bin/zsh
 
-NTFY_TOPIC=$1
+NTFY_URLTOPIC=$1
 NTFY_TITLE="Systemd Failed Notifier"
 # Default exclusions
 EXCLUDE_UNITS="pulseaudio"
 #EXCLUDE_UNITS="pulseaudio,bluetooth"
 
-if [[ -z "$NTFY_TOPIC" ]]
+if [[ -z "$NTFY_URLTOPIC" ]]
 then
     echo "You need to pass in a ntfy topic as argument or 'print' to just echo the output"
     exit 1
@@ -51,10 +51,12 @@ $unit_status
 
     # Only send notification if there are actual units to report
     if [[ $has_units_to_report -eq 1 ]]; then
-        if [[ "$NTFY_TOPIC" == "print" ]]; then
+        if [[ "$NTFY_URLTOPIC" == "print" ]]; then
             echo "$message"
         else
-            ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+            # ntfy publish --quiet --priority=high --tags=warning $NTFY_URLTOPIC "$message"
+            apprise --title "Systemd outage" --body "$message" "ntfys://$NTFY_URLTOPIC"
+            ntfy publish --quiet --priority=high --tags=warning $NTFY_URLTOPIC "$message"
         fi
     fi
 fi
@@ -94,10 +96,10 @@ $unit_status
 
     # Only send notification if there are actual units to report
     if [[ $has_units_to_report -eq 1 ]]; then
-        if [[ "$NTFY_TOPIC" == "print" ]]; then
+        if [[ "$NTFY_URLTOPIC" == "print" ]]; then
             echo "$message"
         else
-            ntfy publish --quiet --priority=high --tags=warning $NTFY_TOPIC "$message"
+            apprise --title "Systemd outage" --body "$message" "ntfys://$NTFY_URLTOPIC"
         fi
     fi
 fi
