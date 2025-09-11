@@ -54,9 +54,7 @@ $unit_status
         if [[ "$NTFY_URLTOPIC" == "print" ]]; then
             echo "$message"
         else
-            # ntfy publish --quiet --priority=high --tags=warning $NTFY_URLTOPIC "$message"
             apprise --title "Systemd outage" --body "$message" "ntfys://$NTFY_URLTOPIC"
-            ntfy publish --quiet --priority=high --tags=warning $NTFY_URLTOPIC "$message"
         fi
     fi
 fi
