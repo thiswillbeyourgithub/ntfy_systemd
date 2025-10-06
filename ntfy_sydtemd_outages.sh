@@ -23,7 +23,7 @@ failed_units=$(systemctl list-units --state=failed,degraded --no-legend --plain)
 if [[ -n "$failed_units" ]]; then
     # Format the message
     message="Problematic systemd units detected\n\n"
-    has_units_to_report=0
+    unit_count=0
     
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
@@ -46,15 +46,15 @@ if [[ -n "$failed_units" ]]; then
 $unit_status
 
 "
-        has_units_to_report=1
+        unit_count=$((unit_count + 1))
     done <<< "$failed_units"
 
     # Only send notification if there are actual units to report
-    if [[ $has_units_to_report -eq 1 ]]; then
+    if [[ $unit_count -gt 0 ]]; then
         if [[ "$NTFY_URLTOPIC" == "print" ]]; then
             echo "$message"
         else
-            apprise --title "Systemd outage" --body "$message" "ntfys://$NTFY_URLTOPIC"
+            apprise --title "$unit_count Systemd Outage(s)" --body "$message" "ntfys://$NTFY_URLTOPIC"
         fi
     fi
 fi
@@ -66,7 +66,7 @@ failed_units=$(systemctl --user list-units --state=failed,degraded --no-legend -
 if [[ -n "$failed_units" ]]; then
     # Format the message
     message="Problematic systemd user units detected\n\n"
-    has_units_to_report=0
+    unit_count=0
     
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
@@ -89,15 +89,15 @@ if [[ -n "$failed_units" ]]; then
 $unit_status
 
 "
-        has_units_to_report=1
+        unit_count=$((unit_count + 1))
     done <<< "$failed_units"
 
     # Only send notification if there are actual units to report
-    if [[ $has_units_to_report -eq 1 ]]; then
+    if [[ $unit_count -gt 0 ]]; then
         if [[ "$NTFY_URLTOPIC" == "print" ]]; then
             echo "$message"
         else
-            apprise --title "Systemd outage" --body "$message" "ntfys://$NTFY_URLTOPIC"
+            apprise --title "$unit_count Systemd Outage(s)" --body "$message" "ntfys://$NTFY_URLTOPIC"
         fi
     fi
 fi
