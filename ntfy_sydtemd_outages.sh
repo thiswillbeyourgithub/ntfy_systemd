@@ -17,13 +17,16 @@ if [[ "$2" == "--exclude" && -n "$3" ]]; then
     EXCLUDE_UNITS="$3"
 fi
 
-# Get failed/degraded units
+# Initialize message and counter for combined notification
+message=""
+unit_count=0
+
+# Get failed/degraded system units
 failed_units=$(systemctl list-units --state=failed,degraded --no-legend --plain)
 
 if [[ -n "$failed_units" ]]; then
-    # Format the message
-    message="Problematic systemd units detected\n\n"
-    unit_count=0
+    # Add system units section if there are any
+    message+="=== System Units ===\n\n"
     
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
@@ -48,25 +51,14 @@ $unit_status
 "
         unit_count=$((unit_count + 1))
     done <<< "$failed_units"
-
-    # Only send notification if there are actual units to report
-    if [[ $unit_count -gt 0 ]]; then
-        if [[ "$NTFY_URLTOPIC" == "print" ]]; then
-            echo "$message"
-        else
-            apprise --title "$unit_count Systemd Outage(s)" --body "$message" "ntfys://$NTFY_URLTOPIC"
-        fi
-    fi
 fi
 
-
-# now same for user units
+# Get failed/degraded user units
 failed_units=$(systemctl --user list-units --state=failed,degraded --no-legend --plain)
 
 if [[ -n "$failed_units" ]]; then
-    # Format the message
-    message="Problematic systemd user units detected\n\n"
-    unit_count=0
+    # Add user units section if there are any
+    message+="\n=== User Units ===\n\n"
     
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
@@ -91,13 +83,13 @@ $unit_status
 "
         unit_count=$((unit_count + 1))
     done <<< "$failed_units"
+fi
 
-    # Only send notification if there are actual units to report
-    if [[ $unit_count -gt 0 ]]; then
-        if [[ "$NTFY_URLTOPIC" == "print" ]]; then
-            echo "$message"
-        else
-            apprise --title "$unit_count Systemd Outage(s)" --body "$message" "ntfys://$NTFY_URLTOPIC"
-        fi
+# Send a single notification if there are any units to report
+if [[ $unit_count -gt 0 ]]; then
+    if [[ "$NTFY_URLTOPIC" == "print" ]]; then
+        echo "$message"
+    else
+        apprise --title "$unit_count Systemd Outage(s)" --body "$message" "ntfys://$NTFY_URLTOPIC"
     fi
 fi
