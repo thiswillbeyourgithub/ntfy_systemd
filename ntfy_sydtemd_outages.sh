@@ -26,7 +26,9 @@ failed_units=$(systemctl list-units --state=failed,degraded --no-legend --plain)
 
 if [[ -n "$failed_units" ]]; then
     # Add system units section if there are any
-    message+="=== System Units ===\r\r"
+    message+="=== System Units ===
+
+"
     
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
@@ -58,7 +60,10 @@ failed_units=$(systemctl --user list-units --state=failed,degraded --no-legend -
 
 if [[ -n "$failed_units" ]]; then
     # Add user units section if there are any
-    message+="\r=== User Units ===\r\r"
+    message+="
+=== User Units ===
+
+"
     
     while IFS= read -r unit; do
         unit_name=$(echo "$unit" | awk '{print $1}')
