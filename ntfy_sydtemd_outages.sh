@@ -3,8 +3,7 @@
 NTFY_URLTOPIC=$1
 NTFY_TITLE="Systemd Failed Notifier"
 # Default exclusions
-EXCLUDE_UNITS="pulseaudio,systemd-suspend,tracker-miner-fs"
-#EXCLUDE_UNITS="pulseaudio,bluetooth"
+EXCLUDE_UNITS=""
 
 if [[ -z "$NTFY_URLTOPIC" ]]
 then
